@@ -34,7 +34,7 @@ profile = pathlib.Path.home() / ".mozilla/firefox" / "fsaqzro1.default-esr" / "s
 
 with open(profile, "rb") as f:
     f.read(8)  # skip the header
-    data = json.loads(lz4.block.decompress(f.read()).decode("utf-8"))
+    data = json.loads(lz4.block.decompress(f.read()).decode("utf-8")) # decode the jsonlz4 data
 
 # Get the active tab from the first window
 window = data["windows"][0]
@@ -70,7 +70,7 @@ options.add_argument('-headless')
 # redirection the log to /dev/null 
 service = Service(log_path='/dev/null')
 
-# start the browser 
+# start the browser, it creates a new session which is not logged into any account therefore it is in romanian
 driver = webdriver.Firefox(options=options, service=service)
 
 # navigate to the page 
@@ -79,7 +79,9 @@ driver.get(url)
 
 #for i in soup.get_text().splitlines():
 # print(i)
-    
+
+
+#! at times it just does not works
 for text in soup.stripped_strings:
     print(text)
 

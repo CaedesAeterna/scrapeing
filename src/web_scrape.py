@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
-
+import time
+import datetime
 
 import get_current_tab
 import get_cookies
@@ -53,7 +54,7 @@ cookies = get_cookies.cookies
 url = get_current_tab.url
 
 # navigate to the page
-driver.get(url)
+# driver.get(url)
 
 
 # Add each cookie. Make sure domain, path, and expiry (if any) are set appropriately.
@@ -69,22 +70,53 @@ for host, name, value, path, expiry in cookies:
 
 driver.get(url)
 
+html = driver.page_source
+soup = BeautifulSoup(html, "lxml")
 
-#! at times it just does not works
-for text in soup.get_text().splitlines():
-    if text:
-        print(text)
+
+# current timestamp in second since the epoch 1970
+ts = time.time()
+
+
+# file name based upon current timespatmp
+file_name = datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d_%H:%M:%S")
+
+
+# create the txt file
+with open(file_name, mode="wt") as f:
+    #! at times it just does not works
+    for text in soup.stripped_strings:
+        if text:
+            print(text)
+            f.write(text)
+            f.write("\n")
+
+# print(file_name)
 
 
 """
+
+
 for br in soup.find_all("<br>"):
     br.replace_with(" ")
 for text in soup.get_text(separator=" ", strip=True).splitlines():
     print(text)
 
 
-for text in soup.stripped_strings:
+for text in soup.get_text().split():
     print(text)
 
 
 """
+'''
+firefox extension url
+
+endpoint urlt kap
+endpoint search
+python uvicorn fastapi
+szimpla process json-ne
+backend elsőnek szimpla 
+
+akár leválasztani
+
+'''

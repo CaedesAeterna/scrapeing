@@ -1,0 +1,1 @@
+/scrape/ --> endpoint a url is given and it returns the text of given site

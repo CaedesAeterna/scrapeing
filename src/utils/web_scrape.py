@@ -1,35 +1,67 @@
-
 from bs4 import BeautifulSoup
 import bs4
+
 # import selenium
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
-import time, datetime, requests
+import time, datetime, requests, re
 
 
-#import get_current_tab
-#import get_cookies
+# import get_current_tab
+# import get_cookies
+
 
 async def scrape_url(url: str):
     # Fetch webpage content
-    response = requests.get(url)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
+    response = requests.get(url, headers=headers)
     response.raise_for_status()  # Check for HTTP errors
-    
+
     # Parse HTML content
-    soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # Extract and clean text content
-    clean_lines = []
-    for line in soup.stripped_strings:
-        # Add proper spacing between sentences
-        formatted_line = line.replace('.', '. ').replace('  ', ' ')
-        clean_lines.append(formatted_line)
-    
-    # Join lines with newlines for readability
-    formatted_text = '\n'.join(clean_lines)
-    
-    return formatted_text
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    # Remove unwanted elements
+    for element in soup(
+        ["script", "style", "nav", "footer", "iframe", '[class*="ads"]']
+    ):
+        element.decompose()
+
+    # Get title
+    title = soup.title.string if soup.title else "No title"
+
+    # Extract content from main content areas first
+    main_content = soup.find(
+        ["main", "article", '[role="main"]', ".content", "#content"]
+    )
+
+    if main_content:
+        content_soup = main_content
+    else:
+        content_soup = soup
+
+    formatted_text = ""
+
+    for line in content_soup.get_text().splitlines():
+        # Skip very short lines
+        if len(line) < 4:
+            continue
+
+        if len(line) < 40:
+            # Add the line to formatted_text with a newline before and after
+            formatted_text += "\n" + line + "\n"
+        else:
+            # Add the line to formatted_text witg a double  newline after
+            formatted_text += line + "\n \n"
+
+    ts = time.time()
+
+    # Add metadata
+    final_text = f"Title: {title}\nSource: {url}\nDate scraped: {datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')}\n\n{formatted_text}"
+
+    return final_text
 
     # redirection the log to /dev/null
     service = Service(log_path="/dev/null")
@@ -45,7 +77,6 @@ async def scrape_url(url: str):
         "general.useragent.override",
         "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
     )
-
 
     #! trying to use logged in profile
     # start the browser, it creates a new session which is not logged into any account therefore it is in romanian
@@ -65,20 +96,19 @@ async def scrape_url(url: str):
 # ? color
 
 
-
 # ? profile path implementation not really usable i killed my profile once
 # profile_path = pathlib.Path.home() / ".mozilla/firefox" / "fsaqzro1.default-esr"
 # options.add_argument(f"--profile={profile_path}")
 # profile = webdriver.FirefoxProfile(profile_path)
 
 
-#cookies = get_cookies.cookies
-#url = get_current_tab.url
+# cookies = get_cookies.cookies
+# url = get_current_tab.url
 
 # navigate to the page
 # driver.get(url)
 
-'''
+"""
 # Add each cookie. Make sure domain, path, and expiry (if any) are set appropriately.
 for host, name, value, path, expiry in cookies:
     cookie = {"name": name, "value": value, "path": path, "domain": host}
@@ -89,8 +119,8 @@ for host, name, value, path, expiry in cookies:
             cookie["expiry"] = expiry
         driver.add_cookie(cookie)
 
-'''
-'''
+"""
+"""
 # current timestamp in second since the epoch 1970
 ts = time.time()
 
@@ -110,7 +140,7 @@ with open(file_name, mode="wt") as f:
 
 # print(file_name)
 
-'''
+"""
 
 """
 

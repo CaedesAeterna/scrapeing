@@ -76,7 +76,7 @@ async def scrape(url: HttpUrl):
 
         # print("Scraped text:", text_result)
 
-        return {"already_scraped": False, "result": result}
+        return {"already_scraped": False, "result": insert_result}
 
         #! for some reason this doesn't work
         return Response(content=result, media_type="text/plain")

@@ -60,7 +60,7 @@ async def scrape(url: HttpUrl):
 
     if result is not None:
 
-        print("URL already exists in the database")
+        #print("URL already exists in the database")
 
         return {"already_scraped": True, "result": result}
 
@@ -75,12 +75,14 @@ async def scrape(url: HttpUrl):
             query=query, values={"url": str(url), "text": text_result}
         )
 
-        print(insert_result)
+        #print(insert_result)
+
+        ''''
         if insert_result is not None:
             print("Scraped text inserted into the database")
         else:
             print("Failed to insert scraped text into the database")
-
+        '''
         # Return safely escaped text
         # safe_content = html.escape(result)  # HTML escape for security
         # return Response(content=safe_content, media_type="text/html")

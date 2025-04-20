@@ -42,8 +42,18 @@ async def scrape_url(url: str):
     paragraphs = []
     for block in content_soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6", "li"]):
         text = block.get_text(separator=" ", strip=True)
-        if text:
-            paragraphs.append(text)
+
+        # Filter out short or meaningless text
+        if text and len(text.split()) > 5:  # Keep paragraphs with more than 5 words
+            # Exclude text that appears to be lists, citations, or metadata
+            if not re.match(r"^\s*[\w\s,]+(:|,|\|)\s*$", text):  # Avoid lists
+                if not re.search(
+                    r"(↑|^\s*[\w\s,]+(:|,|\|)\s*$|doi|ISBN|ISSN|Retrieved|OCLC|pp\.|Vol\.|ed\.|Archived|http|www|\.com|\.org|\.gov|\.edu)",
+                    text,
+                    re.IGNORECASE,
+                ):  # Avoid citations and URLs
+                    if not re.match(r"^\^", text):  # Avoid footnote-style references
+                        paragraphs.append(text)
 
     # Join paragraphs with double newlines to separate them
     formatted_text = "\n\n".join(paragraphs)

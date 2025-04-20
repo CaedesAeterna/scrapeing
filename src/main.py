@@ -3,6 +3,8 @@ from src.utils.web_scrape import scrape_url
 from fastapi import FastAPI, Response
 from contextlib import asynccontextmanager
 from pydantic import HttpUrl
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 
 import os, html
 
@@ -27,6 +29,15 @@ async def lifespan(app: FastAPI):
 
 # create the FastAPI app instance
 app = FastAPI(lifespan=lifespan, title="Web Scraper API", version="1.0.0")
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
+
+# Serve the frontend
+@app.get("/", response_class=HTMLResponse)
+async def serve_frontend():
+    with open(os.path.join("src/static", "index.html")) as f:
+        return f.read()
 
 
 # define the routes for the app

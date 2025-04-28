@@ -1,11 +1,14 @@
 from bs4 import BeautifulSoup
-import bs4
 
-# import selenium
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-import time, datetime, requests, re
+
+import time, datetime, requests, re, logging
+
+# Configure logging
+logging.basicConfig(
+    filename="src/logs/scrape.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 async def scrape_url(url: str):
@@ -66,5 +69,5 @@ async def scrape_url(url: str):
         f"Date scraped: {datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
         f"{formatted_text}"
     )
-
+    logging.info(f"Scraping completed for URL: {url}")
     return final_text

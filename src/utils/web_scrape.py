@@ -1,11 +1,14 @@
 from bs4 import BeautifulSoup
-import bs4
 
-# import selenium
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-import time, datetime, requests, re
+
+import time, datetime, requests, re, logging
+
+# Configure logging
+logging.basicConfig(
+    filename="src/logs/scrape.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
 
 
 async def scrape_url(url: str):
@@ -42,8 +45,18 @@ async def scrape_url(url: str):
     paragraphs = []
     for block in content_soup.find_all(["p", "h1", "h2", "h3", "h4", "h5", "h6", "li"]):
         text = block.get_text(separator=" ", strip=True)
-        if text:
-            paragraphs.append(text)
+
+        # Filter out short or meaningless text
+        if text and len(text.split()) > 5:  # Keep paragraphs with more than 5 words
+            # Exclude text that appears to be lists, citations, or metadata
+            if not re.match(r"^\s*[\w\s,]+(:|,|\|)\s*$", text):  # Avoid lists
+                if not re.search(
+                    r"(↑|^\s*[\w\s,]+(:|,|\|)\s*$|doi|ISBN|ISSN|Retrieved|OCLC|pp\.|Vol\.|ed\.|Archived|http|www|\.com|\.org|\.gov|\.edu)",
+                    text,
+                    re.IGNORECASE,
+                ):  # Avoid citations and URLs
+                    if not re.match(r"^\^", text):  # Avoid footnote-style references
+                        paragraphs.append(text)
 
     # Join paragraphs with double newlines to separate them
     formatted_text = "\n\n".join(paragraphs)
@@ -56,5 +69,5 @@ async def scrape_url(url: str):
         f"Date scraped: {datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')}\n\n"
         f"{formatted_text}"
     )
-
+    logging.info(f"Scraping completed for URL: {url}")
     return final_text

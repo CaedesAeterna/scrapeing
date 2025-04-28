@@ -13,21 +13,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await fetch(`/scrape/${encodeURIComponent(url)}`);
+
+            // Check if the response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
             const data = await response.json();
 
-            // Display the result with line breaks
-            const resultElement = document.getElementById("scrape-result");
-            resultElement.style.whiteSpace = "pre-wrap"; // Ensure line breaks are respected
-            const formattedText = JSON.stringify(data.result.text, null, 2)
-                .replace(/\\n/g, "\n") // Replace escaped \n with actual newlines
-                .replace(/: /g, ":\n") // Add a newline after each colon and space
-                .replace(/ - /g, "\n- "); // Add a newline before each dash
-            resultElement.textContent = formattedText;
+            // Log the response for debugging
+            console.log("Response data:", data);
+
+            // Handle the response format
+            if (typeof data.result === "number") {
+                // If result is a number, display it
+                document.getElementById("scrape-result").textContent = `Scrape result: data has successfully scraped`;
+            } else if (data.result && typeof data.result.text === "string") {
+                // If result contains text, display it
+                const resultElement = document.getElementById("scrape-result");
+                resultElement.style.whiteSpace = "pre-wrap"; // Ensure line breaks are respected
+                const formattedText = data.result.text
+                    .replace(/\\n/g, "\n") // Replace escaped \n with actual newlines
+                    .replace(/: /g, ":\n") // Add a newline after each colon and space
+                    .replace(/ - /g, "\n- "); // Add a newline before each dash
+                resultElement.textContent = formattedText;
+            } else {
+                throw new Error("Unexpected response format");
+            }
         } catch (error) {
+            console.error("Error during scraping:", error); // Log the error for debugging
             alert("Failed to scrape the URL");
         }
 
-        // Clear previous url
+        // Clear previous URL
         document.getElementById("scrape-url").value = "";
 
     });

@@ -7,3 +7,4 @@ get_current_tab.py
 __pycache__
 .env
 notes.py
+scrape.log

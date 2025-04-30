@@ -1,5 +1,7 @@
 // background.js
 
+const backendScrapeUrl = "http://127.0.0.1:8000/scrape/";
+
 // Listen for toolbar button clicks
 browser.browserAction.onClicked.addListener(async (tab) => {
     console.log("Extension clicked, tab URL:", tab.url); // Debug log
@@ -12,7 +14,7 @@ browser.browserAction.onClicked.addListener(async (tab) => {
         }
 
         // Send URL to local backend
-        const response = await fetch(`http://127.0.0.1:8000/scrape/${encodeURIComponent(url)}`, {
+        const response = await fetch(`${backendScrapeUrl}${encodeURIComponent(url)}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
@@ -30,7 +32,7 @@ browser.browserAction.onClicked.addListener(async (tab) => {
 // Create a context menu item
 browser.contextMenus.create({
     id: "send-to-backend",
-    title: "Send Link to Backend",
+    title: "Send Link to Backend for Scraping",
     contexts: ["page", "link"], // Show on right-clicking a page or a link
 });
 
@@ -56,7 +58,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
     try {
         // Send the URL to the backend
-        const response = await fetch(`http://127.0.0.1:8000/scrape/${encodeURIComponent(urlToSend)}`, {
+        const response = await fetch(`${backendScrapeUrl}${encodeURIComponent(urlToSend)}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });

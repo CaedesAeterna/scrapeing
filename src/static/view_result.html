@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Result</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Ensure proper line breaking for the text */
+        pre {
+            white-space: pre-wrap;
+            /* Preserve line breaks and allow wrapping */
+            word-wrap: break-word;
+            /* Break long words if necessary */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>View Result</h1>
+        <a href="/" class="button">Back to Search</a>
+
+        <div id="result-container">
+            <p>Loading...</p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+
+            if (!id) {
+                document.getElementById("result-container").textContent = "No result ID provided.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/view_result/${id}`);
+                const data = await response.json();
+
+                if (data.already_scraped) {
+                    const resultContainer = document.getElementById("result-container");
+                    resultContainer.innerHTML = `
+                        <h2>Result Details</h2>
+                        <p><strong>Time:</strong> ${data.time}</p>
+                        <p><strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a></p>
+                        <pre><strong>Text:</strong>\n${data.text}</pre>
+                    `;
+                } else {
+                    document.getElementById("result-container").textContent = "Result not found.";
+                }
+            } catch (error) {
+                console.error("Error fetching result:", error);
+                document.getElementById("result-container").textContent = "Failed to load result.";
+            }
+        });
+    </script>
+</body>
+
+</html>

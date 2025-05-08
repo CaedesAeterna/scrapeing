@@ -1,0 +1,17 @@
+{
+    "manifest_version": 2,
+    "name": "Send URL to Local Scraper",
+    "version": "1.0",
+    "description": "Sends the current tab URL to a local scraping backend",
+    "permissions": ["activeTab", "contextMenus", "http://127.0.0.1/*"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+    },
+    "browser_action": {
+        "default_title": "Send URL"
+    }
+}
+
+
+

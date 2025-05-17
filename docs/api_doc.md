@@ -1,58 +1,200 @@
-## project documentation
+# Web Scraper Project Documentation
 
-### api structure 
-    root/
-    ├── docs/
-    │   └── documentation.md
-    ├── src/
-    │   ├── main.py
-    │   ├── database.py
-    │   └── utils/
-    │       └── web_scrape.py
-    ├── venv/
-    ├── .gitignore
-    └── README.md
+## Project Structure
 
+```
+root/
+├── docs/
+│   └── api_doc.md
+├── src/
+│   ├── main.py
+│   ├── database.py
+│   ├── requirements.txt
+│   └── utils/
+│       └── web_scrape.py
+│   └── static/
+│       ├── index.html
+│       ├── styles.css
+│       ├── script.js
+│       └── view_result.html
+│   └── extension/
+│       └── firefox-ext/
+│           ├── manifest.json
+│           └── background.js
+├── venv/
+├── .gitignore
+└── README.md
+```
 
-### api functioning
-#### endpoints
+---
 
-    /scrape/ --> endpoint a url is given and it returns the text of given site
+## API Endpoints
 
-        it gives back a disctionary with the following elements
+### `/scrape/{url}`
 
-        already_scraped: boolean if true the link was alread scraped else it was not 
-        result: with the three following data part
-            time: when was it scraped first
-            url: which url
-            text: the scraped text
-    
-    /search_url/ --> searches by give url, it has to be case sensitive returns the folowing values
+- **Description:**  
+  Scrapes the given URL and returns the extracted text content.  
+  If the URL was already scraped, returns the cached result.
 
-        already_scraped: boolean if true the link was alread scraped else it was not 
+- **Response:**  
+  ```json
+  {
+    "already_scraped": true | false,
+    "result": {
+      "time": "YYYY-MM-DD HH:MM:SS",
+      "url": "https://example.com",
+      "text": "Extracted text content..."
+    }
+  }
+  ```
+  - If not previously scraped, `result` may be an integer (insert id).
 
-        result: a single result with the following structure
+---
 
-            time: above explained already
-            url: above explained already
-            text above explained already
+### `/search_url/{url}`
 
+- **Description:**  
+  Searches for a previously scraped URL (case sensitive).
 
-    /search_keyword/ --> searches for given keyword, it has to be case sensitive
+- **Response:**  
+  ```json
+  {
+    "already_scraped": true | false,
+    "result": {
+      "time": "YYYY-MM-DD HH:MM:SS",
+      "url": "https://example.com",
+      "text": "Extracted text content..."
+    } | null
+  }
+  ```
 
-        returns the folowing values
+---
 
-        already_scraped: boolean if true the link was alread scraped else it was not 
+### `/search_keyword/{keyword}`
 
-        result: a list/dictionary of elements with the following structure with given index regarding the amount of results 
+- **Description:**  
+  Searches for a keyword (case sensitive) in all scraped texts.
 
-            0: 
-                time: above explained already
-                url: above explained already
-                text above explained already
-            1: 
-                time: above explained already
-                url: above explained already
-                text above explained already
+- **Response:**  
+  ```json
+  {
+    "already_scraped": true | false,
+    "results": [
+      {
+        "id": 1,
+        "time": "YYYY-MM-DD HH:MM:SS",
+        "url": "https://example.com",
+        "view_text_link": "/view_result/1"
+      },
+      ...
+    ] | "No results found from backend during search"
+  }
+  ```
+
+---
+
+### `/view_result/{id}`
+
+- **Description:**  
+  Returns the full scraped text for a given result ID.
+
+- **Response:**  
+  ```json
+  {
+    "already_scraped": true | false,
+    "id": 1,
+    "time": "YYYY-MM-DD HH:MM:SS",
+    "url": "https://example.com",
+    "text": "Extracted text content..."
+  }
+  ```
+
+---
+
+## Notes
+
+- All endpoints use HTTP GET and expect/return JSON unless otherwise specified.
+- The `/scrape` endpoint also supports query parameters: `/scrape?url=https://example.com`
+- The API is case sensitive for both URLs and keywords.
+- The `already_scraped` flag indicates whether the data was fetched from cache or newly scraped.
+- Timestamps are in `YYYY-MM-DD HH:MM:SS` format.
+- The frontend is served at `/` and static files are under `/static/`.
+
+---
+
+## Example Usage
+
+### Scrape a URL
+
+```
+GET /scrape/https://example.com
+```
+
+### Search by URL
+
+```
+GET /search_url/https://example.com
+```
+
+### Search by Keyword
+
+```
+GET /search_keyword/someKeyword
+```
+
+### View Full Result
+
+```
+GET /view_result/1
+```
+
+---
+
+## Frontend
+
+- Main page: `/static/index.html`
+- View result: `/static/view_result.html?id={id}`
+
+---
+
+## Dependencies
+
+See [`src/requirements.txt`](../src/requirements.txt):
+
+- fastapi
+- uvicorn
+- databases
+- aiomysql
+- beautifulsoup4
+- selenium
+- requests
+
+---
+
+## Environment Variables
+
+Set in `.env` (not tracked in git):
+
+- `DB_USER`
+- `DB_PASSWORD`
+- `DB_HOST`
+- `DB_NAME`
+- `DB_PORT`
+
+---
+
+## Logging
+
+- Scraping logs are written to `src/logs/scrape.log`.
+
+---
+
+## Extension
+
+- Firefox extension in `src/extension/firefox-ext/` allows sending the current tab URL to the backend for scraping.
+
+---
+---
+
 
 

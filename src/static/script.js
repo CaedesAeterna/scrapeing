@@ -83,6 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+
+    
     // Search by Keyword
     document.getElementById("search-keyword-btn").addEventListener("click", async () => {
         // Clear previous results
@@ -101,9 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log(data); // Debugging: Log the API response
 
             // Handle multiple results
-            const results = data.result || [];
-            if (!Array.isArray(results) || results.length === 0) {
-                document.getElementById("search-keyword-result").textContent = "No results found.";
+            const results = data.results || [];
+            if (!Array.isArray(data.results) || data.results.length === 0) {
+                document.getElementById("search-keyword-result").textContent = "No results found from frontend.";
                 return;
             }
 
@@ -113,11 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
             resultElement.textContent = ""; // Clear previous content
 
             results.forEach((item, index) => {
-                // Create a container for each result
                 const resultContainer = document.createElement("div");
                 resultContainer.style.marginBottom = "1em";
 
-                // Add result details
                 const title = document.createElement("h4");
                 title.textContent = `Result ${index + 1}`;
                 resultContainer.appendChild(title);
@@ -132,11 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 time.textContent = `Time: ${item.time}`;
                 resultContainer.appendChild(time);
 
-                const text = document.createElement("p");
-                text.textContent = item.text;
-                resultContainer.appendChild(text);
+                const viewTextLink = document.createElement("a");
+                viewTextLink.href = `/static/view_result.html?id=${item.id}`;
+                viewTextLink.textContent = "View Full Text";
+                viewTextLink.target = "_self"; // Open in the same tab
+                resultContainer.appendChild(viewTextLink);
 
-                // Append the result container to the result element
                 resultElement.appendChild(resultContainer);
             });
         } catch (error) {

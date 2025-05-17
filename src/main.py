@@ -33,6 +33,7 @@ app = FastAPI(lifespan=lifespan, title="Web Scraper API", version="1.0.0")
 # Mount static files
 app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
+
 # Serve the frontend
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend():
@@ -60,7 +61,7 @@ async def scrape(url: HttpUrl):
 
     if result is not None:
 
-        #print("URL already exists in the database")
+        # print("URL already exists in the database")
 
         return {"already_scraped": True, "result": result}
 
@@ -75,14 +76,14 @@ async def scrape(url: HttpUrl):
             query=query, values={"url": str(url), "text": text_result}
         )
 
-        #print(insert_result)
+        # print(insert_result)
 
-        ''''
+        """'
         if insert_result is not None:
             print("Scraped text inserted into the database")
         else:
             print("Failed to insert scraped text into the database")
-        '''
+        """
         # Return safely escaped text
         # safe_content = html.escape(result)  # HTML escape for security
         # return Response(content=safe_content, media_type="text/html")
@@ -109,14 +110,40 @@ async def search(url: HttpUrl):
 
 @app.get("/search_keyword/{keyword:path}")
 async def search(keyword: str):
-    query = "SELECT time, url, text FROM scraped_text WHERE text LIKE :keyword"
-    results = await db.fetch_all(query=query, values={"keyword": f"%\n{keyword}%"})
+    query = "SELECT id, time, url FROM scraped_text WHERE text LIKE :keyword"
+    results = await db.fetch_all(query=query, values={"keyword": f"%{keyword}%"})
 
-    # print (results)
     if results is not None:
-        return {"already_scraped": True, "result": results}
+        # Add a link to view the full text for each result
+        results_with_links = [
+            {
+                "id": result["id"],
+                "time": result["time"],
+                "url": result["url"],
+                "view_text_link": f"/view_result/{result['id']}",
+            }
+            for result in results
+        ]
+        return {"already_scraped": True, "results": results_with_links}
 
-    return {"already_scraped": False, "result": None}
+    return {"already_scraped": False, "results": "No results found from backend during search"}
+
+
+@app.get("/view_result/{id}")
+async def view_result(id: int):
+    query = "SELECT time, url, text FROM scraped_text WHERE id = :id"
+    result = await db.fetch_one(query=query, values={"id": id})
+
+    if result:
+        return {
+            "already_scraped": True,
+            "id": id,
+            "time": result["time"],
+            "url": result["url"],
+            "text": result["text"],
+        }
+
+    return {"already_scraped": False, "id": id, "result": "No result found for this ID"}
 
 
 # ------------------using query parameters--------------------------

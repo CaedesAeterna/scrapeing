@@ -1,0 +1,92 @@
+# Projektmenedzsment Terv
+
+## 1. Követelményanalízis
+
+A projekt célja egy webes scraper rendszer fejlesztése, amely képes weboldalakról szöveges tartalmat kinyerni, azokat adatbázisban tárolni, keresni bennük, valamint egy böngésző kiegészítőn keresztül is elérhetővé tenni a scraping funkciót. A rendszerhez frontend felület is tartozik, amelyen keresztül a felhasználó egyszerűen használhatja a szolgáltatásokat.
+
+**Főbb követelmények:**
+- Weboldalak szövegének letöltése és feldolgozása.
+- Eredmények tárolása adatbázisban.
+- Keresés URL vagy kulcsszó alapján.
+- Eredmények megtekintése azonosító alapján.
+- Frontend felület a funkciók eléréséhez.
+- Firefox böngésző kiegészítő integráció.
+- Naplózás a scraping műveletekről.
+- Környezeti változók támogatása (adatbázis eléréshez).
+
+## 2. Követelményspecifikáció
+
+### Funkcionális követelmények
+- A rendszer képes legyen tetszőleges URL-t letölteni és a szöveget kinyerni.
+- Az eredményeket MySQL adatbázisban tárolja.
+- A felhasználó kereshet URL vagy kulcsszó alapján.
+- A keresési eredményekből az adott rekord teljes szövege megtekinthető.
+- A frontend felületen keresztül minden funkció elérhető.
+- A böngésző kiegészítő egy kattintással elküldi az aktuális URL-t a backendnek scraping céljából.
+
+### Nem-funkcionális követelmények
+- A rendszer REST API-t biztosít JSON válaszokkal.
+- A rendszer naplózza a scraping eseményeket.
+- A rendszer támogatja a környezeti változókból történő konfigurációt.
+- A frontend reszponzív és felhasználóbarát legyen.
+- A kód legyen jól dokumentált és karbantartható.
+
+## 3. Részletes tervezés
+
+### Architektúra
+- **Backend:** Python (FastAPI), adatbázis-kezelés (databases, aiomysql), scraping (BeautifulSoup, requests).
+- **Frontend:** Statikus HTML, CSS, JavaScript.
+- **Adatbázis:** MySQL, `scraped_text` tábla (id, url, text, time).
+- **Böngésző kiegészítő:** Firefox extension (manifest.json, background.js).
+
+### Fő modulok
+- **main.py:** API végpontok, statikus fájlok kiszolgálása.
+- **database.py:** Adatbázis kapcsolat kezelése.
+- **web_scrape.py:** Weboldalak letöltése és szöveg kinyerése.
+- **static/**: Frontend fájlok (index.html, view_result.html, styles.css, script.js).
+- **extension/firefox-ext/**: Böngésző kiegészítő forrásai.
+
+### Folyamatok
+1. **Scraping:**  
+   - Felhasználó megad egy URL-t → backend letölti, feldolgozza, eltárolja (ha új).
+2. **Keresés:**  
+   - Felhasználó keres URL vagy kulcsszó alapján → backend visszaadja a találatokat.
+3. **Eredmény megtekintése:**  
+   - Felhasználó kiválaszt egy találatot → backend visszaadja a teljes szöveget.
+4. **Böngésző kiegészítő:**  
+   - Felhasználó elküldi az aktuális URL-t → backend feldolgozza.
+
+### Adatbázis séma (példa)
+```sql
+CREATE TABLE scraped_text (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    url VARCHAR(2048) NOT NULL,
+    text LONGTEXT NOT NULL,
+    time DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## 4. Tesztmenedzsment
+
+### Tesztelési szintek
+- **Egységtesztek:**  
+  - web_scrape.py függvényeinek tesztelése (pl. helyes szöveg kinyerés, hibakezelés).
+- **Integrációs tesztek:**  
+  - API végpontok tesztelése (pl. scraping, keresés, eredmény lekérés).
+- **Frontend tesztek:**  
+  - Felhasználói felület működésének ellenőrzése (inputok, gombok, megjelenítés).
+- **Böngésző kiegészítő tesztelése:**  
+  - URL küldés backendnek, válaszok kezelése.
+
+### Tesztelési módszerek
+- Manuális tesztelés: funkciók végigpróbálása a frontend felületen.
+
+### Tesztelési környezet
+- Fejlesztői gép: Debian 12, Python 3.10+, MySQL szerver.
+- Böngésző: Firefox (kiegészítő teszteléséhez).
+
+## 5. Következtetések – Összefoglalás
+
+A projekt egy teljes körű webes scraping rendszert valósít meg, amely támogatja a szövegek letöltését, tárolását, keresését és megjelenítését, valamint böngésző kiegészítővel is bővíthető. A rendszer rugalmas, könnyen bővíthető, és a modern webes technológiákra épül. A dokumentáció, a részletes tervezés és a tesztelési terv biztosítja a projekt átláthatóságát és a minőségi működést.
+
+---

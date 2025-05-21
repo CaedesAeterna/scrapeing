@@ -167,7 +167,6 @@ Lásd [`src/requirements.txt`](../src/requirements.txt):
 - databases
 - aiomysql
 - beautifulsoup4
-- selenium
 - requests
 
 ---

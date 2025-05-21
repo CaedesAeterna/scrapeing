@@ -1,37 +1,56 @@
-# Projektmenedzsment Terv
+# Dokmentáció
+
+## 1. Bevezető
+
+## A rendszer architektúrája
 
 ## 1. Követelményanalízis
 
 A projekt célja egy webes scraper rendszer fejlesztése, amely képes weboldalakról szöveges tartalmat kinyerni, azokat adatbázisban tárolni, keresni bennük, valamint egy böngésző kiegészítőn keresztül is elérhetővé tenni a scraping funkciót. A rendszerhez frontend felület is tartozik, amelyen keresztül a felhasználó egyszerűen használhatja a szolgáltatásokat.
 
-**Főbb követelmények:**
-- Weboldalak szövegének letöltése és feldolgozása.
-- Eredmények tárolása adatbázisban.
-- Keresés URL vagy kulcsszó alapján.
-- Eredmények megtekintése azonosító alapján.
-- Frontend felület a funkciók eléréséhez.
-- Firefox böngésző kiegészítő integráció.
-- Naplózás a scraping műveletekről.
-- Környezeti változók támogatása (adatbázis eléréshez).
 
-## 2. Követelményspecifikáció
+## Elméleti megalapozás
 
-### Funkcionális követelmények
-- A rendszer képes legyen tetszőleges URL-t letölteni és a szöveget kinyerni.
-- Az eredményeket MySQL adatbázisban tárolja.
-- A felhasználó kereshet URL vagy kulcsszó alapján.
-- A keresési eredményekből az adott rekord teljes szövege megtekinthető.
-- A frontend felületen keresztül minden funkció elérhető.
-- A böngésző kiegészítő egy kattintással elküldi az aktuális URL-t a backendnek scraping céljából.
 
-### Nem-funkcionális követelmények
-- A rendszer REST API-t biztosít JSON válaszokkal.
-- A rendszer naplózza a scraping eseményeket.
-- A rendszer támogatja a környezeti változókból történő konfigurációt.
-- A frontend reszponzív és felhasználóbarát legyen.
-- A kód legyen jól dokumentált és karbantartható.
 
-## 3. Részletes tervezés
+
+## 3. Rendszer specifikációi
+   ### 3.1 Felhasználói követelmények:
+      Weboldalak szövegének letöltése és feldolgozása.
+      Eredmények tárolása adatbázisban.
+      Keresés URL vagy kulcsszó alapján.
+      Eredmények megtekintése azonosító alapján.
+      Frontend felület a funkciók eléréséhez.
+      Firefox böngésző kiegészítő integráció.
+      Naplózás a scraping műveletekről.
+      Környezeti változók támogatása (adatbázis eléréshez).
+
+### 3.1.1 Funkcionális követelmények
+      A rendszer képes legyen tetszőleges URL-t letölteni és a szöveget kinyerni.
+      Az eredményeket MySQL adatbázisban tárolja.
+      A felhasználó kereshet URL vagy kulcsszó alapján.
+      A keresési eredményekből az adott rekord teljes szövege megtekinthető.
+      A frontend felületen keresztül minden funkció elérhető.
+      A böngésző kiegészítő egy kattintással elküldi az aktuális URL-t a backendnek scraping céljából.
+
+### 3.1.2 Nem-funkcionális követelmények
+      A rendszer REST API-t biztosít JSON válaszokkal.
+      A rendszer naplózza a scraping eseményeket.
+      A rendszer támogatja a környezeti változókból történő konfigurációt.
+      A frontend reszponzív és felhasználóbarát legyen.
+      A kód legyen jól dokumentált és karbantartható.
+
+
+
+
+
+
+
+
+
+
+
+## 3. Részletes tervezés A részletes tervezés
 
 ### Architektúra
 - **Backend:** Python (FastAPI), adatbázis-kezelés (databases, aiomysql), scraping (BeautifulSoup, requests).

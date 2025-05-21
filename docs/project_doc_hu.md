@@ -66,27 +66,4 @@ CREATE TABLE scraped_text (
 );
 ```
 
-## 4. Tesztmenedzsment
-
-### Tesztelési szintek
-- **Egységtesztek:**  
-  - web_scrape.py függvényeinek tesztelése (pl. helyes szöveg kinyerés, hibakezelés).
-- **Integrációs tesztek:**  
-  - API végpontok tesztelése (pl. scraping, keresés, eredmény lekérés).
-- **Frontend tesztek:**  
-  - Felhasználói felület működésének ellenőrzése (inputok, gombok, megjelenítés).
-- **Böngésző kiegészítő tesztelése:**  
-  - URL küldés backendnek, válaszok kezelése.
-
-### Tesztelési módszerek
-- Manuális tesztelés: funkciók végigpróbálása a frontend felületen.
-
-### Tesztelési környezet
-- Fejlesztői gép: Debian 12, Python 3.10+, MySQL szerver.
-- Böngésző: Firefox (kiegészítő teszteléséhez).
-
-## 5. Következtetések – Összefoglalás
-
-A projekt egy teljes körű webes scraping rendszert valósít meg, amely támogatja a szövegek letöltését, tárolását, keresését és megjelenítését, valamint böngésző kiegészítővel is bővíthető. A rendszer rugalmas, könnyen bővíthető, és a modern webes technológiákra épül. A dokumentáció, a részletes tervezés és a tesztelési terv biztosítja a projekt átláthatóságát és a minőségi működést.
-
 ---

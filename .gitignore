@@ -8,3 +8,4 @@ __pycache__
 .env
 notes.py
 scrape.log
+.~lock.project_doc.odt#

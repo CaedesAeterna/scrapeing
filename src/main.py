@@ -11,7 +11,8 @@ import os, html
 # print("CWD:", os.getcwd())
 
 
-# create the database instance
+# Lifespan context manager for the FastAPI app
+# This is used to manage the database connection lifecycle
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup db
@@ -19,13 +20,6 @@ async def lifespan(app: FastAPI):
     yield
     # shutdown db
     await db.disconnect()
-
-
-# if db.connection:
-# print("Database is connected")
-# else:
-# print("Database is not connected")
-
 
 # create the FastAPI app instance
 app = FastAPI(lifespan=lifespan, title="Web Scraper API", version="1.0.0")

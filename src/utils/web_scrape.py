@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 
 
 import time, datetime, requests, re, logging
+from playwright.async_api import async_playwright
 
 # Configure logging
 logging.basicConfig(
@@ -13,14 +14,30 @@ logging.basicConfig(
 
 async def scrape_url(url: str):
     # Fetch webpage content
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    }
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()  # Check for HTTP errors
+    # headers = {
+    # "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    # }
+    # response = requests.get(url, headers=headers)
+    # # response.raise_for_status()  # Check for HTTP errors
 
+    # # Fetch webpage content with JS rendering
+    # session = AsyncHTMLSession()
+    # headers = {
+    #     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    # }
+    # response = await session.get(url, headers=headers)
+    # response.html.arender(timeout=20)  # JS rendering
+
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
+        await page.goto(url, timeout=60000)
+        # Wait for the page to load some content (customize selector as needed)
+        await page.wait_for_load_state("networkidle")
+        html = await page.content()
+        await browser.close()
     # Parse HTML content
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(html, "html.parser")
 
     # Remove unwanted elements
     for element in soup(

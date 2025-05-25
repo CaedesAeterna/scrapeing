@@ -36,7 +36,7 @@ async def scrape_url(url: str):
         await page.wait_for_load_state("networkidle")
         html = await page.content()
         await browser.close()
-        
+
     # Parse HTML content
     soup = BeautifulSoup(html, "html.parser")
 

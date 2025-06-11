@@ -1,6 +1,6 @@
-fastapi==0.95.2
-uvicorn==0.22.0
-databases==0.6.0
-aiomysql==0.1.1
-beautifulsoup4==4.12.2
-requests==2.31.0
+fastapi
+uvicorn
+databases
+aiomysql
+beautifulsoup4
+requests

@@ -4,3 +4,4 @@ databases
 aiomysql
 beautifulsoup4
 requests
+playwright

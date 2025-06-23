@@ -5,3 +5,4 @@ aiomysql
 beautifulsoup4
 requests
 playwright
+spacy

@@ -1,8 +1,27 @@
 from bs4 import BeautifulSoup
-
-
 import time, datetime, requests, re, logging
 from playwright.async_api import async_playwright
+
+# --- Add these imports ---
+import spacy
+
+# Load spaCy model (run: python -m spacy download en_core_web_sm)
+nlp = spacy.load("en_core_web_sm")
+
+def extract_entities(text):
+    doc = nlp(text)
+    return [(ent.text, ent.label_) for ent in doc.ents]
+
+def classify_topic(text):
+    # Simple rule-based example, replace with ML if needed
+    lowered = text.lower()
+    if "research" in lowered:
+        return "Research"
+    if "news" in lowered:
+        return "News"
+    if "tutorial" in lowered:
+        return "Tutorial"
+    return "General"
 
 # Configure logging
 logging.basicConfig(
@@ -110,4 +129,14 @@ async def scrape_url(url: str):
         f"{formatted_text}"
     )
     logging.info(f"Scraping completed for URL: {url}")
-    return final_text
+
+    # --- Advanced categorisation ---
+    entities = extract_entities(formatted_text)
+    topic = classify_topic(formatted_text)
+
+    # Return structured result
+    return {
+        "text": final_text,
+        "entities": entities,
+        "topic": topic,
+    }

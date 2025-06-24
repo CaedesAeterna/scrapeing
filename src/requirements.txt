@@ -6,3 +6,6 @@ beautifulsoup4
 requests
 playwright
 spacy
+transformers
+tensorflow
+tf-keras

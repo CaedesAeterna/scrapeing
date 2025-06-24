@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import time, datetime, requests, re, logging
 from playwright.async_api import async_playwright
+from transformers import pipeline
 
 # --- Add these imports ---
 import spacy
@@ -8,20 +9,151 @@ import spacy
 # Load spaCy model (run: python -m spacy download en_core_web_sm)
 nlp = spacy.load("en_core_web_sm")
 
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+labels = ["News", "Research", "Tutorial", "Unknown"]
+
+
 def extract_entities(text):
     doc = nlp(text)
     return [(ent.text, ent.label_) for ent in doc.ents]
 
+
 def classify_topic(text):
-    # Simple rule-based example, replace with ML if needed
     lowered = text.lower()
-    if "research" in lowered:
+    news_keywords = [
+        "news",
+        "breaking",
+        "report",
+        "journalist",
+        "press",
+        "headline",
+        "update",
+        "coverage",
+        "article",
+        "media",
+        "reuters",
+        "bbc",
+        "cnn",
+        "nytimes",
+        "guardian",
+        "al jazeera",
+        "fox news",
+        "ap news",
+        "newsweek",
+        "washington post",
+        "associated press",
+        "bloomberg",
+        "financial times",
+        "the economist",
+        "politico",
+        "huffpost",
+        "buzzfeed",
+        "vox",
+        "vice",
+        "the verge",
+        "techcrunch",
+        "wired",
+        "cnet",
+        "engadget",
+        "mashable",
+        "the atlantic",
+        "the new yorker",
+        "the times",
+        "the sun" "the daily mail",
+        "the independent",
+        "the telegraph",
+        "the mirror",
+        "the spectator",
+        "the observer",
+        "the herald",
+        "the age",
+        "the guardian",
+        "the australian",
+        "the courier mail",
+        "the sydney morning herald",
+        "the financial review",
+        "the australian financial review",
+        "war report",
+        "political news",
+        "international news",
+        "local news",
+        "breaking news",
+        "current affairs",
+        "world news",
+        "local news",
+        "sports news",
+        "entertainment news",
+        "business news",
+        "technology news",
+        "health news",
+        "science news",
+        "environment news",
+        "education news",
+        "lifestyle news",
+        "opinion",
+        "editorial",
+        "commentary" "investigation",
+    ]
+    research_keywords = [
+        "research",
+        "study",
+        "journal",
+        "paper",
+        "doi",
+        "experiment",
+        "findings",
+        "results",
+        "analysis",
+        "methodology",
+        "hypothesis",
+        "theory",
+        "scholar",
+        "academic",
+        "peer-reviewed",
+        "conference",
+        "publication",
+        "citation",
+        "literature review",
+        "systematic review",
+        "meta-analysis",
+        "case study",
+        "field study",
+        "longitudinal study",
+        "cross-sectional study",
+        "qualitative research",
+        "quantitative research",
+        "mixed methods",
+        "data collection",
+        "data analysis",
+        "statistical analysis",
+    ]
+    tutorial_keywords = [
+        "tutorial",
+        "how to",
+        "guide",
+        "step by step",
+        "lesson",
+        "instruction",
+        "training",
+        "course",
+        "workshop",
+        "webinar",
+        "video tutorial",
+        "online course",
+        "e-learning",
+        "self-paced",
+        "hands-on",
+        "practical",
+    ]
+
+    if any(word in lowered for word in research_keywords):
         return "Research"
-    if "news" in lowered:
+    if any(word in lowered for word in news_keywords):
         return "News"
-    if "tutorial" in lowered:
+    if any(word in lowered for word in tutorial_keywords):
         return "Tutorial"
-    return "General"
+    return "Unknown"
+
 
 # Configure logging
 logging.basicConfig(
@@ -81,6 +213,8 @@ async def scrape_url(url: str):
     # Extract readable text while preserving paragraph structure
     paragraphs = []
 
+    # Regex pattern to filter out unwanted text
+    # This pattern matches common citation formats, URLs, and metadata
     pattern = re.compile(
         r"""
     ( ↑
@@ -131,8 +265,12 @@ async def scrape_url(url: str):
     logging.info(f"Scraping completed for URL: {url}")
 
     # --- Advanced categorisation ---
+    # Extract entities using spaCy and zero-shot classifications
     entities = extract_entities(formatted_text)
-    topic = classify_topic(formatted_text)
+    # Classify topic using spaCy and zero-shot classification
+    result = classifier(formatted_text, candidate_labels=labels)
+    # Use the highest scoring label as the topic
+    topic = result["labels"][0]
 
     # Return structured result
     return {

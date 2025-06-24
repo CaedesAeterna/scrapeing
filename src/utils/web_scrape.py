@@ -9,8 +9,9 @@ import spacy
 # Load spaCy model (run: python -m spacy download en_core_web_sm)
 nlp = spacy.load("en_core_web_sm")
 
+# Initialize zero-shot classification pipeline
 classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
-labels = ["News", "Research", "Tutorial", "Unknown"]
+labels = ["News", "Research", "Tutorial", "History", "Unknown"]
 
 
 def extract_entities(text):
@@ -146,12 +147,84 @@ def classify_topic(text):
         "practical",
     ]
 
+    history_keywords = [
+        "history",
+        "historical",
+        "historian",
+        "ancient",
+        "medieval",
+        "modern",
+        "timeline",
+        "chronology",
+        "archaeology",
+        "artifact",
+        "civilization",
+        "empire",
+        "dynasty",
+        "revolution",
+        "war",
+        "battle",
+        "conflict",
+        "treaty",
+        "diplomacy",
+        "colonialism",
+        "imperialism",
+        "decolonization",
+        "renaissance",
+        "enlightenment",
+        "industrial revolution",
+        "world war",
+        "cold war",
+        "historical event",
+        "historical figure",
+        "historical period",
+        "historical context",
+        "historical narrative",
+        "historical analysis",
+        "historical interpretation",
+        "historical research",
+        "historical methodology",
+        "nationalism",
+        "totalitarianism",
+        "dictatorship",
+        "ideology",
+        "irredentism",
+        "expansionism",
+        "corporatism",
+        "racism",
+        "antisemitism",
+        "resistance",
+        "monarchy",
+        "republic",
+        "syndicalism",
+        "militarism",
+        "propaganda",
+        "civil war",
+        "alliance",
+        "occupation",
+        "annexation",
+        "unification",
+        "constitution",
+        "political movement",
+        "economic policy",
+        "social change",
+        "cultural change",
+        "religious change",
+        "historical document",
+        "historical source",
+        "historical evidence",
+        "historical account",
+        "historical narrative",
+    ]
+
     if any(word in lowered for word in research_keywords):
         return "Research"
     if any(word in lowered for word in news_keywords):
         return "News"
     if any(word in lowered for word in tutorial_keywords):
         return "Tutorial"
+    if any(word in lowered for word in history_keywords):
+        return "History"
     return "Unknown"
 
 

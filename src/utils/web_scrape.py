@@ -257,7 +257,7 @@ async def scrape_url(url: str):
         page = await browser.new_page()
         await page.goto(url, timeout=60000)
         # Wait for the page to load some content (customize selector as needed)
-        await page.wait_for_load_state("networkidle")
+        await page.wait_for_load_state("networkidle", timeout=60000)
         html = await page.content()
         await browser.close()
 
@@ -317,7 +317,7 @@ async def scrape_url(url: str):
         text = block.get_text(separator=" ", strip=True)
 
         # Filter out short or meaningless text
-        if text and len(text.split()) > 5:  # Keep paragraphs with more than 5 words
+        if text and len(text.split()) > 0:  # Keep paragraphs with more than 5 words TODO
             # Exclude text that appears to be lists, citations, or metadata
             if not re.match(r"^\s*[\w\s,]+(:|,|\|)\s*$", text):  # Avoid lists
                 if not pattern.search(text):  # Avoid citations and URLs

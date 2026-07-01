@@ -11,7 +11,8 @@ import os, html
 # print("CWD:", os.getcwd())
 
 
-# create the database instance
+# Lifespan context manager for the FastAPI app
+# This is used to manage the database connection lifecycle
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup db
@@ -19,12 +20,6 @@ async def lifespan(app: FastAPI):
     yield
     # shutdown db
     await db.disconnect()
-
-
-# if db.connection:
-# print("Database is connected")
-# else:
-# print("Database is not connected")
 
 
 # create the FastAPI app instance
@@ -60,20 +55,12 @@ async def scrape(url: HttpUrl):
     result = await db.fetch_one(select_query, values={"url": str(url)})
 
     if result is not None:
-
-        # print("URL already exists in the database")
-
         return {"already_scraped": True, "result": result}
-
-        #! for some reason this doesn't work
-        return Response(content=result, media_type="text/plain")
-
     else:
-
         # If not, insert into database
         query = "INSERT INTO scraped_text (url, text) VALUES (:url, :text)"
         insert_result = await db.execute(
-            query=query, values={"url": str(url), "text": text_result}
+            query=query, values={"url": str(url), "text": text_result["text"]}
         )
 
         # print(insert_result)
@@ -90,7 +77,16 @@ async def scrape(url: HttpUrl):
 
         # print("Scraped text:", text_result)
 
-        return {"already_scraped": False, "result": insert_result}
+        # temporary result format TODO: change this to a proper response format 
+        return {
+            "already_scraped": False,
+            "result": insert_result,
+            "text": text_result["text"],
+            "url": str(url),
+            "text_length": len(text_result["text"]),
+            "entities": text_result["entities"],
+            "topic": text_result["topic"],
+        }
 
         #! for some reason this doesn't work
         return Response(content=result, media_type="text/plain")
@@ -126,7 +122,10 @@ async def search(keyword: str):
         ]
         return {"already_scraped": True, "results": results_with_links}
 
-    return {"already_scraped": False, "results": "No results found from backend during search"}
+    return {
+        "already_scraped": False,
+        "results": "No results found from backend during search",
+    }
 
 
 @app.get("/view_result/{id}")
